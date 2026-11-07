@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build C tools
+        run: make -C src
+
+      - name: End-to-end smoke test (primes <= 10^6)
+        run: |
+          set -euo pipefail
+          bin/sieve_gap --out "$RUNNER_TEMP/primes.bin" --limit 1000000 --threads 2
+          test "$(bin/primes_tool count "$RUNNER_TEMP/primes.bin" --upto 1000000)" = "78498"
+          bin/primes_tool verify "$RUNNER_TEMP/primes.bin" --threads 2 --json | grep -q '"ok":1'
+          test "$(bin/primes_tool extract "$RUNNER_TEMP/primes.bin" --limit 10 | tr '\n' ' ')" = "2 3 5 7 11 13 17 19 23 29 "
+          echo "smoke test OK"
+
+      - name: Pure-Python reference decoder
+        run: |
+          set -euo pipefail
+          bin/sieve_gap --out "$RUNNER_TEMP/small.bin" --limit 100000 --threads 1
+          test "$(python3 tools/ref_decoder.py count "$RUNNER_TEMP/small.bin" --upto 100000)" = "9592"

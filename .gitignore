@@ -1,0 +1,25 @@
+# Build outputs
+bin/
+*.o
+verify/build/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Large data corpus - not committed; regenerate with the documented commands
+data/primes_gap.bin
+data/text/primes_upto_100000000.txt
+data/text/primes_upto_1000000000.txt
+data/text/primes_upto_10000000000.txt
+
+# Working / raw artifacts
+reports/_work/
+reports/_selftest/
+verify/synth/
+verify/results/
+logs/
+
+# compiled helper binaries (rebuilt by make)
+reports/fast_stats
+verify/verify_primes
+verify/twin_count
